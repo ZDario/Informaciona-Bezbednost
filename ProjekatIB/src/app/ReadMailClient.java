@@ -1,11 +1,16 @@
 package app;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +30,8 @@ import org.apache.xml.security.utils.JavaUtils;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 
+import model.mailclient.MailBody;
+import keystore.KeyStoreReader;
 import support.MailHelper;
 import support.MailReader;
 import util.Base64;
@@ -55,7 +62,6 @@ public class ReadMailClient extends MailClient {
 			try {
 				
 				mimeMessage = MailReader.getMimeMessage(service, user, fullM.getId());
-				
 				System.out.println("\n Message number " + i);
 				System.out.println("From: " + mimeMessage.getHeader("From", null));
 				System.out.println("Subject: " + mimeMessage.getSubject());
@@ -76,8 +82,24 @@ public class ReadMailClient extends MailClient {
 	    Integer answer = Integer.parseInt(answerStr);
 	    
 		MimeMessage chosenMessage = mimeMessages.get(answer);
-	    
-        //TODO: Decrypt a message and decompress it. The private key is stored in a file.
+		MailBody mailBody = new MailBody(MailHelper.getText(chosenMessage));
+		KeyStoreReader keystore;
+		byte[] secretKeyBytes = null;
+		try {
+			keystore = new KeyStoreReader();
+			keystore.load(new FileInputStream("./data/userb.jks"), "123");
+			PrivateKey privatekey = keystore.getKey("tomel", "123");
+			Cipher rsaCipherDecryp = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+			rsaCipherDecryp.init(Cipher.DECRYPT_MODE, privatekey);
+			secretKeyBytes = rsaCipherDecryp.doFinal(mailBody.getEncKeyBytes());
+			for (byte byt : secretKeyBytes)
+				System.out.print(byt);
+			System.out.println("  -----------");
+			System.out.println("  -----------");
+		} catch (KeyStoreException | NoSuchProviderException | CertificateException e) {
+			e.printStackTrace();
+		}
+		
 		Cipher aesCipherDec = Cipher.getInstance("AES/CBC/PKCS5Padding");
 		SecretKey secretKey = new SecretKeySpec(JavaUtils.getBytesFromFile(KEY_FILE), "AES");
 		
