@@ -65,8 +65,7 @@ public class WriteMailClient extends MailClient {
 		  	//staticka inicijalizacija
 		      Security.addProvider(new BouncyCastleProvider());
 		      org.apache.xml.security.Init.init();
-		  }
-			
+		  }	
 	
 	private static KeyStoreReader keyStoreReader = new KeyStoreReader();
 	public static void main(String[] args) {
@@ -117,7 +116,6 @@ public class WriteMailClient extends MailClient {
         		transformer.transform(source, result);
 
         		System.out.println("File saved!");
-        		
 
             
             //Compression
@@ -141,7 +139,7 @@ public class WriteMailClient extends MailClient {
 			
 			//Preuzimanje setifikata
 			KeyStore keystore= keyStoreReader.readKeyStore(KEY_STORE_FILE, KEY_STORE_PASS.toCharArray());
-			Certificate certificate = keyStoreReader.getCertificateFromKeyStore(keystore, "dario");
+			Certificate certificate = keyStoreReader.getCertificateFromKeyStore(keystore, "userb");
 			
 			PublicKey publicKey = keyStoreReader.getPublicKeyFromCertificate(certificate);
 			System.out.println("\nProcitan javni kljuc iz sertifikata: " + publicKey);
@@ -169,7 +167,6 @@ public class WriteMailClient extends MailClient {
 			doc = encrypt(doc, secretKey1, certificate);
 			saveDocument(doc, "./data/emailPotpisanIEnkriptovan.xml");
 			String bodytextxml=toString(doc);	
-			
 			
 			
 			byte[] ciphersubject = aesCipherEnc.doFinal(compressedSubject.getBytes());
@@ -214,7 +211,6 @@ public class WriteMailClient extends MailClient {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	private static Document signDocument(Document doc, PrivateKey privateKey, Certificate cert) {
 	      
@@ -315,7 +311,6 @@ public class WriteMailClient extends MailClient {
 			return null;
 		} 	
 	}
-
 
 	public static String toString(Document doc) {
 	    try {

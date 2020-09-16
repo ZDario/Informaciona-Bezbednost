@@ -104,7 +104,7 @@ public class ReadMailClient extends MailClient {
 				System.out.println("Subject: " + mimeMessage.getSubject());
 				System.out.println("Body: " + MailHelper.getText(mimeMessage));
 				System.out.println("\n");
-				
+				System.out.println("\n");
 				mimeMessages.add(mimeMessage);
 	        
 			} catch (MessagingException e) {
@@ -122,52 +122,18 @@ public class ReadMailClient extends MailClient {
 		//Dekripcija
 		String ciphertext=MailHelper.getText(chosenMessage);
 		
-	    //String[] arryCipher= ciphertext.split(",");
-		//MailBody body=new MailBody(arryCipher[0],arryCipher[1],arryCipher[2],arryCipher[3]);
+
 		MailBody body = new MailBody(MailHelper.getText(chosenMessage));
 		KeyStore keystore= keyStoreReader.readKeyStore(KEY_STORE_FILE, KEY_STORE_PASS.toCharArray());
 		Certificate certificate = keyStoreReader.getCertificateFromKeyStore(keystore, KEY_STORE_ALIAS);
 		PrivateKey privateKey = keyStoreReader.getPrivateKeyFromKeyStore(keystore, KEY_STORE_ALIAS, KEY_STORE_PASS_FOR_PRIVATE_KEY.toCharArray());
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        /*byte[] Sessionkey= (cipher.doFinal(body.getEncKeyBytes()));
-      
+
         
-        byte[] decodedKey = body.getEncKeyBytes();
-        SecretKey originalKey= new SecretKeySpec(Sessionkey, "AES");
         
-        //TODO: Decrypt a message and decompress it. The private key is stored in a file.
-		Cipher aesCipherDec = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		//SecretKey secretKey = new SecretKeySpec(JavaUtils.getBytesFromFile(KEY_FILE), "AES");
-		byte[] iv1 = body.getIV1Bytes();
-		
-		//byte[] iv1 = JavaUtils.getBytesFromFile(IV1_FILE);
-		IvParameterSpec ivParameterSpec1 = new IvParameterSpec(iv1);
-		aesCipherDec.init(Cipher.DECRYPT_MODE, originalKey, ivParameterSpec1);
-		
-		//String str = MailHelper.getText(chosenMessage);
-		byte[] bodyEnc = aesCipherDec.doFinal(Base64.decode(body.getEncMessage()));
-		
-		String receivedBodyTxt = new String(bodyEnc);
-		
-		String body1 = new String(aesCipherDec.doFinal(Base64.decode(body.getEncMessage())));
-		String decompressedBodyText = GzipUtil.decompress(Base64.decode(body1));
-		System.out.println("Body text: " + decompressedBodyText);
-		
-		
-		//byte[] iv2 = JavaUtils.getBytesFromFile(IV2_FILE);
-		byte[] iv2 = body.getIV1Bytes();
-		IvParameterSpec ivParameterSpec2 = new IvParameterSpec(iv2);
-		//inicijalizacija za dekriptovanje
-		
-		aesCipherDec.init(Cipher.DECRYPT_MODE, originalKey, ivParameterSpec2);
-		aesCipherDec.init(Cipher.DECRYPT_MODE, originalKey, ivParameterSpec1);
-		
-		//dekompresovanje i dekriptovanje subject-a
-		String decryptedSubjectTxt = new String(aesCipherDec.doFinal(Base64.decode(chosenMessage.getSubject())));
-		String decompressedSubjectTxt = GzipUtil.decompress(Base64.decode(decryptedSubjectTxt));
-		System.out.println("Subject text: " + new String(decompressedSubjectTxt));
-		*/
+        
+        
 		//DEKTRIPTOVANJE XML-a
 		String bodyXMLInkriptovano=MailHelper.getText(chosenMessage);
 		Document doc1 = convertStringToXMLDocument( bodyXMLInkriptovano );
@@ -177,7 +143,7 @@ public class ReadMailClient extends MailClient {
 		doc = decrypt(doc, privateKey);
 		saveDocument(doc, "./data/emailDekriptovan.xml");
 		
-		Document doc2 = loadDocument("./data/emailSigned1.xml");
+		Document doc2 = loadDocument("./data/signedEmail1.xml");
 		boolean res = verifySignature(doc);
 		System.out.println("Verification = " + res);
 		boolean res1 = verifySignature(doc2);
